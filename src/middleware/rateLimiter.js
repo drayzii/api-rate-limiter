@@ -2,13 +2,13 @@ const redis = require('redis');
 
 const rateLimiter = (type, RATE_LIMIT_WINDOW_SECONDS, MAX_REQUESTS_PER_WINDOW) => {
   return async (req, res, next) => {
-    const redisClient = await redis.createClient()
-      .on('error', err => console.log('Redis Client Error', err))
-      .connect();
-    
     if (!req.query.id) {
       return res.status(400).json({ error: 'Missing id parameter', type });
     }
+
+    const redisClient = await redis.createClient()
+      .on('error', err => console.log('Redis Client Error', err))
+      .connect();
   
     const key =  type === 'system'
       ? 'rate_limit'
@@ -23,7 +23,6 @@ const rateLimiter = (type, RATE_LIMIT_WINDOW_SECONDS, MAX_REQUESTS_PER_WINDOW) =
   
       if (!requestsCount) {
         await redisClient.setEx(key, RATE_LIMIT_WINDOW_SECONDS, '1');
-        return next();
       } else {
         await redisClient.incr(key);
       }
@@ -32,6 +31,8 @@ const rateLimiter = (type, RATE_LIMIT_WINDOW_SECONDS, MAX_REQUESTS_PER_WINDOW) =
     } catch (error) {
       console.error('Error in rate limiter:', error);
       return res.status(500).json({ error: 'Internal Server Error' });
+    } finally {
+      await redisClient.quit();
     }
   };
 }

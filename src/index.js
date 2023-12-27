@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const rateLimiter = require('./middleware/rateLimiter');
 
@@ -21,6 +22,8 @@ app.get('/test', (req, res) => {
   res.send('Test');
 });
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
+
+module.exports = { app, server };
