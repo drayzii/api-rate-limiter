@@ -1,3 +1,4 @@
+require('dotenv').config();
 const redis = require('redis');
 
 const rateLimiter = (type, RATE_LIMIT_WINDOW_SECONDS, MAX_REQUESTS_PER_WINDOW) => {
@@ -6,8 +7,9 @@ const rateLimiter = (type, RATE_LIMIT_WINDOW_SECONDS, MAX_REQUESTS_PER_WINDOW) =
       return res.status(400).json({ error: 'Missing id parameter', type });
     }
 
-    // We can connect to centralised Redis server here to ensure that all instances of our application share the same rate limit counters.
-    const redisClient = await redis.createClient()
+    // We can connect to a centralised Redis server here to ensure that all instances of our application share the same rate limit counters.
+    const redisUrl = process.env.REDISCLOUD_URL || 'redis://localhost:6379';
+    const redisClient = await redis.createClient({ url: redisUrl })
       .on('error', err => console.log('Redis Client Error', err))
       .connect();
   
