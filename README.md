@@ -68,4 +68,5 @@ npm test
 
 ## Rate Limiting
 
-The application implements rate limiting for system-wide, client-specific, and monthly quotas. The configured limits can be found in the `.env` file.
+- The application implements rate limiting for system-wide, client-specific, and monthly quotas. The configured limits can be found in the `.env` file.
+- **We can connect to a centralised Redis server to ensure that all instances of our application share the same rate limit counters.**

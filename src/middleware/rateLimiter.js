@@ -6,6 +6,7 @@ const rateLimiter = (type, RATE_LIMIT_WINDOW_SECONDS, MAX_REQUESTS_PER_WINDOW) =
       return res.status(400).json({ error: 'Missing id parameter', type });
     }
 
+    // We can connect to centralised Redis server here to ensure that all instances of our application share the same rate limit counters.
     const redisClient = await redis.createClient()
       .on('error', err => console.log('Redis Client Error', err))
       .connect();
